@@ -6,13 +6,15 @@ const app = express();
 const userRoutes = require("./Routes/user");
 const authRoutes = require("./Routes/auth");
 const songRoutes = require("./Routes/songs");
+const playlistRoutes = require("./Routes/playlist");
+
 
 app.use(cors())
 app.use(express.json())
 app.use("/api/users/" , userRoutes);
 app.use("/api/login/" , authRoutes);
 app.use("/api/songs/" , songRoutes);
-
+app.use("/api/playlists",playlistRoutes);
 
 const DataBaseConnect = require("./DataBaseConnection")
 

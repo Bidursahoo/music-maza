@@ -126,7 +126,36 @@ router.get("/random", auth , (req,res)=>{
 
 router.get("/:id" , [validObjectId , auth] , (req,res)=>{
     Playlist.findById(req.params.id).then((playlist)=>{
-        if(!playlist) return res.status(404).send()
+        if(!playlist) return res.status(404).send("not found");
+        Song.find({_id: playlist.songs}).then((songs)=>{
+            res.status(200).send({data:{playlist,songs}})
+        })
+    })
+})
+
+//get all playlist
+router.get("/",auth,(req,res)=>{
+    Playlist.find().then((playlists)=>{
+        res.status(200).send({
+            data:playlists
+        })
+    })
+})
+//delete playlist by id
+router.delete("/:id",[validObjectId , auth] , (req,res)=>{
+    User.findById(req.user._id).then((user)=>{
+        Playlist.findById(req.params.id).then((playlist)=>{
+            if(user._id.equals(playlist.user)){
+                return res.status(403).send({message: "User dont have access to remove"})
+            }
+            const index = user.playlists.indexOf(req.params.id);
+            user.playlists.splice(index,1);
+            user.save().then(()=>{
+                playlist.remove().then(()=>{
+                    res.status(200).send({message: "Removed from library"})
+                })
+            })
+        })
     })
 })
 
